@@ -1,0 +1,40 @@
+meta {
+  name: Validation - Invalid Status
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{baseUrl}}/tasks/1
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "status": "INVALID"
+  }
+}
+
+assert {
+  res.status: eq 400
+  res.body.success: eq false
+}
+
+tests {
+  test("should reject invalid status", function() {
+    expect(res.getStatus()).to.equal(400);
+  });
+
+  test("should return status validation error", function() {
+    const errors = res.getBody().errors;
+    expect(errors).to.be.an("array");
+  });
+}
+
+docs {
+  ## Validation: Invalid Status
+
+  Status must be one of: `TODO`, `IN_PROGRESS`, `DONE`.
+  Any other value is rejected with a 400 error.
+}

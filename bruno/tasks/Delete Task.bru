@@ -1,0 +1,50 @@
+meta {
+  name: Delete Task
+  type: http
+  seq: 9
+}
+
+delete {
+  url: {{baseUrl}}/tasks/1
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.body.success: eq true
+}
+
+tests {
+  test("should return 200 OK", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("should return success message", function() {
+    const body = res.getBody();
+    expect(body.success).to.equal(true);
+    expect(body.message).to.equal("Task deleted successfully");
+  });
+}
+
+docs {
+  ## DELETE /tasks/:id
+
+  Permanently delete a task.
+
+  ### Path Parameters
+  | Param | Type   | Required | Description  |
+  |-------|--------|----------|--------------|
+  | id    | number | ✅ Yes   | Task ID      |
+
+  ### Response (200 OK)
+  ```json
+  {
+    "success": true,
+    "message": "Task deleted successfully"
+  }
+  ```
+
+  ### Response (404 Not Found)
+  Returned when the task ID does not exist.
+}

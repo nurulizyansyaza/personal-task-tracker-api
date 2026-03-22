@@ -1,0 +1,71 @@
+meta {
+  name: Get Task by ID
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/tasks/1
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.body.success: eq true
+  res.body.data.id: eq 1
+}
+
+tests {
+  test("should return 200 OK", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("should return task with matching id", function() {
+    const task = res.getBody().data;
+    expect(task.id).to.equal(1);
+  });
+
+  test("should return all task fields", function() {
+    const task = res.getBody().data;
+    expect(task).to.have.all.keys("id", "title", "description", "status", "created_at");
+  });
+}
+
+docs {
+  ## GET /tasks/:id
+
+  Retrieve a single task by its ID.
+
+  ### Path Parameters
+  | Param | Type   | Required | Description  |
+  |-------|--------|----------|--------------|
+  | id    | number | ✅ Yes   | Task ID      |
+
+  ### Response (200 OK)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": 1,
+      "title": "Buy groceries",
+      "description": "Milk, eggs, bread",
+      "status": "TODO",
+      "created_at": "2026-03-22T12:00:00.000Z"
+    }
+  }
+  ```
+
+  ### Response (404 Not Found)
+  ```json
+  {
+    "success": false,
+    "statusCode": 404,
+    "error": "Not Found",
+    "message": "We couldn't find that task. It may have been deleted.",
+    "errors": [{ "code": "TASK_NOT_FOUND", "message": "..." }],
+    "timestamp": "2026-03-22T12:00:00.000Z",
+    "path": "/tasks/999"
+  }
+  ```
+}

@@ -1,0 +1,88 @@
+meta {
+  name: Error - Task Not Found
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/tasks/99999
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 404
+  res.body.success: eq false
+  res.body.statusCode: eq 404
+}
+
+tests {
+  test("should return 404 for non-existent task", function() {
+    expect(res.getStatus()).to.equal(404);
+  });
+
+  test("should return structured error response", function() {
+    const body = res.getBody();
+    expect(body.success).to.equal(false);
+    expect(body.statusCode).to.equal(404);
+    expect(body.error).to.equal("Not Found");
+  });
+
+  test("should return human-friendly message", function() {
+    const body = res.getBody();
+    expect(body.message).to.be.a("string");
+    expect(body.message).to.contain("couldn't find");
+  });
+
+  test("should return errors array with TASK_NOT_FOUND code", function() {
+    const errors = res.getBody().errors;
+    expect(errors).to.be.an("array");
+    expect(errors[0].code).to.equal("TASK_NOT_FOUND");
+  });
+
+  test("should include timestamp and path", function() {
+    const body = res.getBody();
+    expect(body.timestamp).to.be.a("string");
+    expect(body.path).to.contain("/tasks/99999");
+  });
+}
+
+docs {
+  ## Error: Task Not Found (404)
+
+  Returned when requesting a task ID that doesn't exist.
+
+  ### Error Response Structure
+  All error responses follow this consistent format:
+
+  ```json
+  {
+    "success": false,
+    "statusCode": 404,
+    "error": "Not Found",
+    "message": "We couldn't find that task. It may have been deleted.",
+    "errors": [
+      {
+        "code": "TASK_NOT_FOUND",
+        "message": "We couldn't find that task. It may have been deleted."
+      }
+    ],
+    "timestamp": "2026-03-22T12:00:00.000Z",
+    "path": "/tasks/99999"
+  }
+  ```
+
+  ### Error Codes Reference
+  | Code                | HTTP Status | Description                          |
+  |---------------------|-------------|--------------------------------------|
+  | VALIDATION_FAILED   | 400         | Input validation failed              |
+  | TITLE_REQUIRED      | 400         | Title is missing or empty            |
+  | TITLE_TOO_LONG      | 400         | Title exceeds 100 characters         |
+  | DESCRIPTION_TOO_LONG| 400         | Description exceeds 500 characters   |
+  | INVALID_STATUS      | 400         | Status is not TODO/IN_PROGRESS/DONE  |
+  | UNKNOWN_FIELDS      | 400         | Request contains unknown fields      |
+  | TASK_NOT_FOUND      | 404         | Task ID does not exist               |
+  | RATE_LIMIT_EXCEEDED | 429         | Too many requests                    |
+  | DATABASE_ERROR      | 400         | Database operation failed            |
+  | INTERNAL_ERROR      | 500         | Unexpected server error              |
+}

@@ -1,0 +1,68 @@
+meta {
+  name: Health Check
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/health
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.body.status: eq ok
+}
+
+tests {
+  test("should return status ok", function() {
+    const body = res.getBody();
+    expect(body.status).to.equal("ok");
+  });
+
+  test("should include timestamp", function() {
+    const body = res.getBody();
+    expect(body.timestamp).to.be.a("string");
+  });
+
+  test("should include uptime", function() {
+    const body = res.getBody();
+    expect(body.uptime).to.be.a("number");
+    expect(body.uptime).to.be.greaterThan(0);
+  });
+
+  test("should include database status", function() {
+    const body = res.getBody();
+    expect(body.database).to.have.property("status");
+    expect(body.database.status).to.equal("ok");
+  });
+}
+
+docs {
+  ## GET /health
+
+  Health check endpoint to verify the API and database connectivity.
+
+  ### Response (200 OK)
+  ```json
+  {
+    "status": "ok",
+    "timestamp": "2026-03-22T12:00:00.000Z",
+    "uptime": 123.456,
+    "environment": "production",
+    "database": { "status": "ok" }
+  }
+  ```
+
+  ### Response (503 Service Unavailable)
+  ```json
+  {
+    "status": "degraded",
+    "timestamp": "2026-03-22T12:00:00.000Z",
+    "uptime": 123.456,
+    "environment": "production",
+    "database": { "status": "error", "message": "Database unreachable" }
+  }
+  ```
+}

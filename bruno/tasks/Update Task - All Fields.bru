@@ -1,0 +1,39 @@
+meta {
+  name: Update Task - All Fields
+  type: http
+  seq: 8
+}
+
+put {
+  url: {{baseUrl}}/tasks/1
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "title": "Complete project report",
+    "description": "Final review and submit by Friday",
+    "status": "DONE"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.success: eq true
+}
+
+tests {
+  test("should update all fields", function() {
+    const task = res.getBody().data;
+    expect(task.title).to.equal("Complete project report");
+    expect(task.description).to.equal("Final review and submit by Friday");
+    expect(task.status).to.equal("DONE");
+  });
+}
+
+docs {
+  ## PUT /tasks/:id — Update All Fields
+
+  Update title, description, and status in a single request.
+}

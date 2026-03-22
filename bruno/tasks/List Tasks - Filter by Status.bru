@@ -1,0 +1,33 @@
+meta {
+  name: List Tasks - Filter by Status
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/tasks?status=TODO
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.body.success: eq true
+  res.body.data: isArray
+}
+
+tests {
+  test("should only return tasks with TODO status", function() {
+    const tasks = res.getBody().data;
+    for (const task of tasks) {
+      expect(task.status).to.equal("TODO");
+    }
+  });
+}
+
+docs {
+  ## GET /tasks?status=TODO
+
+  Filter tasks by status. Valid values: `TODO`, `IN_PROGRESS`, `DONE`.
+  Returns only tasks matching the given status.
+}

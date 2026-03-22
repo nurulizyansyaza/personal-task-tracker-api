@@ -1,0 +1,41 @@
+meta {
+  name: Validation - Missing Title
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/tasks
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "description": "A task without a title"
+  }
+}
+
+assert {
+  res.status: eq 400
+  res.body.success: eq false
+}
+
+tests {
+  test("should reject request without title", function() {
+    expect(res.getStatus()).to.equal(400);
+    expect(res.getBody().success).to.equal(false);
+  });
+
+  test("should return validation error", function() {
+    const errors = res.getBody().errors;
+    expect(errors).to.be.an("array");
+    expect(errors.length).to.be.greaterThan(0);
+  });
+}
+
+docs {
+  ## Validation: Missing Title
+
+  The `title` field is required. Requests without it are rejected.
+}

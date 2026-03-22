@@ -1,0 +1,93 @@
+meta {
+  name: Create Task
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/tasks
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "title": "Buy groceries",
+    "description": "Milk, eggs, bread"
+  }
+}
+
+assert {
+  res.status: eq 201
+  res.body.success: eq true
+  res.body.data.title: eq Buy groceries
+}
+
+tests {
+  test("should return 201 Created", function() {
+    expect(res.getStatus()).to.equal(201);
+  });
+
+  test("should return success true", function() {
+    const body = res.getBody();
+    expect(body.success).to.equal(true);
+  });
+
+  test("should return task with correct title", function() {
+    const task = res.getBody().data;
+    expect(task.title).to.equal("Buy groceries");
+  });
+
+  test("should return task with correct description", function() {
+    const task = res.getBody().data;
+    expect(task.description).to.equal("Milk, eggs, bread");
+  });
+
+  test("should default status to TODO", function() {
+    const task = res.getBody().data;
+    expect(task.status).to.equal("TODO");
+  });
+
+  test("should return auto-generated id", function() {
+    const task = res.getBody().data;
+    expect(task.id).to.be.a("number");
+    expect(task.id).to.be.greaterThan(0);
+  });
+
+  test("should return created_at timestamp", function() {
+    const task = res.getBody().data;
+    expect(task.created_at).to.be.a("string");
+  });
+
+  test("should return success message", function() {
+    const body = res.getBody();
+    expect(body.message).to.equal("Task created successfully");
+  });
+}
+
+docs {
+  ## POST /tasks
+
+  Create a new task. Every task starts with status `TODO`.
+
+  ### Request Body
+  | Field       | Type   | Required | Max Length | Description        |
+  |-------------|--------|----------|------------|--------------------|
+  | title       | string | ✅ Yes   | 100 chars  | Task title         |
+  | description | string | ❌ No    | 500 chars  | Task description   |
+
+  ### Response (201 Created)
+  ```json
+  {
+    "success": true,
+    "data": {
+      "id": 1,
+      "title": "Buy groceries",
+      "description": "Milk, eggs, bread",
+      "status": "TODO",
+      "created_at": "2026-03-22T12:00:00.000Z"
+    },
+    "message": "Task created successfully"
+  }
+  ```
+}

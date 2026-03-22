@@ -1,0 +1,70 @@
+meta {
+  name: List All Tasks
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/tasks
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+  res.body.success: eq true
+  res.body.data: isArray
+}
+
+tests {
+  test("should return 200 OK", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("should return success true", function() {
+    expect(res.getBody().success).to.equal(true);
+  });
+
+  test("should return array of tasks", function() {
+    const data = res.getBody().data;
+    expect(data).to.be.an("array");
+  });
+
+  test("each task should have required fields", function() {
+    const tasks = res.getBody().data;
+    if (tasks.length > 0) {
+      const task = tasks[0];
+      expect(task).to.have.property("id");
+      expect(task).to.have.property("title");
+      expect(task).to.have.property("status");
+      expect(task).to.have.property("created_at");
+    }
+  });
+}
+
+docs {
+  ## GET /tasks
+
+  List all tasks, ordered by `created_at` descending (newest first).
+
+  ### Query Parameters
+  | Param  | Type   | Required | Values                     | Description         |
+  |--------|--------|----------|----------------------------|---------------------|
+  | status | string | ❌ No    | TODO, IN_PROGRESS, DONE    | Filter by status    |
+
+  ### Response (200 OK)
+  ```json
+  {
+    "success": true,
+    "data": [
+      {
+        "id": 1,
+        "title": "Buy groceries",
+        "description": "Milk, eggs, bread",
+        "status": "TODO",
+        "created_at": "2026-03-22T12:00:00.000Z"
+      }
+    ]
+  }
+  ```
+}

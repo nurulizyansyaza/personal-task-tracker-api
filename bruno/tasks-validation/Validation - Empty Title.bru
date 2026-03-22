@@ -1,0 +1,75 @@
+meta {
+  name: Validation - Empty Title
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/tasks
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "title": ""
+  }
+}
+
+assert {
+  res.status: eq 400
+  res.body.success: eq false
+}
+
+tests {
+  test("should reject empty title with 400", function() {
+    expect(res.getStatus()).to.equal(400);
+  });
+
+  test("should return success false", function() {
+    expect(res.getBody().success).to.equal(false);
+  });
+
+  test("should return human-friendly error message", function() {
+    const body = res.getBody();
+    expect(body.message).to.be.a("string");
+    expect(body.message.length).to.be.greaterThan(10);
+  });
+
+  test("should return errors array with field info", function() {
+    const errors = res.getBody().errors;
+    expect(errors).to.be.an("array");
+    expect(errors.length).to.be.greaterThan(0);
+    expect(errors[0]).to.have.property("code");
+    expect(errors[0]).to.have.property("message");
+  });
+
+  test("should include timestamp", function() {
+    expect(res.getBody().timestamp).to.be.a("string");
+  });
+}
+
+docs {
+  ## Validation: Empty Title
+
+  The `title` field is required and cannot be empty.
+
+  ### Expected Error Response (400)
+  ```json
+  {
+    "success": false,
+    "statusCode": 400,
+    "error": "Bad Request",
+    "message": "Please check your input and try again.",
+    "errors": [
+      {
+        "code": "TITLE_REQUIRED",
+        "message": "Every task needs a title. Please add one.",
+        "field": "title"
+      }
+    ],
+    "timestamp": "2026-03-22T12:00:00.000Z",
+    "path": "/tasks"
+  }
+  ```
+}

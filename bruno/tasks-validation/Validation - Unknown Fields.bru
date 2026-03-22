@@ -1,0 +1,46 @@
+meta {
+  name: Validation - Unknown Fields
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/tasks
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "title": "Valid task",
+    "priority": "high",
+    "tags": ["urgent"]
+  }
+}
+
+assert {
+  res.status: eq 400
+  res.body.success: eq false
+}
+
+tests {
+  test("should reject unknown fields", function() {
+    expect(res.getStatus()).to.equal(400);
+  });
+
+  test("should return unknown field error", function() {
+    const errors = res.getBody().errors;
+    expect(errors).to.be.an("array");
+    const unknownErr = errors.find(e => e.code === "UNKNOWN_FIELDS");
+    expect(unknownErr).to.not.be.undefined;
+  });
+}
+
+docs {
+  ## Validation: Unknown Fields
+
+  The API uses `whitelist: true` and `forbidNonWhitelisted: true`.
+  Any fields not defined in the DTO are rejected.
+
+  In this example, `priority` and `tags` are not valid fields.
+}

@@ -1,0 +1,51 @@
+meta {
+  name: Update Task - Title
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{baseUrl}}/tasks/1
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "title": "Buy groceries and snacks"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.success: eq true
+  res.body.data.title: eq Buy groceries and snacks
+}
+
+tests {
+  test("should return 200 OK", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("should return updated title", function() {
+    const task = res.getBody().data;
+    expect(task.title).to.equal("Buy groceries and snacks");
+  });
+
+  test("should return success message", function() {
+    expect(res.getBody().message).to.equal("Task updated successfully");
+  });
+}
+
+docs {
+  ## PUT /tasks/:id — Update Title
+
+  Update a task's title. Only the fields provided are updated.
+
+  ### Request Body (partial update)
+  ```json
+  {
+    "title": "Buy groceries and snacks"
+  }
+  ```
+}

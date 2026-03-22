@@ -1,0 +1,49 @@
+meta {
+  name: Update Task - Status
+  type: http
+  seq: 7
+}
+
+put {
+  url: {{baseUrl}}/tasks/1
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "status": "IN_PROGRESS"
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.success: eq true
+  res.body.data.status: eq IN_PROGRESS
+}
+
+tests {
+  test("should update status to IN_PROGRESS", function() {
+    const task = res.getBody().data;
+    expect(task.status).to.equal("IN_PROGRESS");
+  });
+
+  test("should preserve other fields", function() {
+    const task = res.getBody().data;
+    expect(task.title).to.be.a("string");
+    expect(task.id).to.be.a("number");
+  });
+}
+
+docs {
+  ## PUT /tasks/:id — Update Status
+
+  Move a task between columns by updating its status.
+
+  ### Valid Status Values
+  | Status       | Description              |
+  |-------------|--------------------------|
+  | TODO        | Task is in the backlog   |
+  | IN_PROGRESS | Task is being worked on  |
+  | DONE        | Task is completed        |
+}
