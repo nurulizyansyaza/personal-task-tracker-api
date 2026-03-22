@@ -13,23 +13,53 @@ import { HealthController } from './../src/health/health.controller';
 import { HealthService } from './../src/health/health.service';
 import { AllExceptionsFilter } from './../src/common/filters/all-exceptions.filter';
 
+interface TaskResponse {
+  success: boolean;
+  data: {
+    id: number;
+    title: string;
+    description?: string;
+    status: TaskStatus;
+  };
+  message?: string;
+  errors?: { code: string; message: string }[];
+}
+
+interface TaskListResponse {
+  success: boolean;
+  data: { id: number; title: string; status: TaskStatus }[];
+}
+
+interface HealthResponse {
+  status: string;
+  database: { status: string };
+  timestamp: string;
+}
+
+interface ErrorResponse {
+  success: boolean;
+  errors?: { code: string; message: string }[];
+}
+
 function createMockTaskRepository() {
   let tasks: TaskEntity[] = [];
   let nextId = 1;
 
   return {
-    find: jest.fn().mockImplementation(
-      (options?: {
-        where?: { status?: TaskStatus };
-        order?: Record<string, string>;
-      }) => {
-        let result = [...tasks];
-        if (options?.where?.status) {
-          result = result.filter((t) => t.status === options.where!.status);
-        }
-        return Promise.resolve(result);
-      },
-    ),
+    find: jest
+      .fn()
+      .mockImplementation(
+        (options?: {
+          where?: { status?: TaskStatus };
+          order?: Record<string, string>;
+        }) => {
+          let result = [...tasks];
+          if (options?.where?.status) {
+            result = result.filter((t) => t.status === options.where!.status);
+          }
+          return Promise.resolve(result);
+        },
+      ),
     findOne: jest
       .fn()
       .mockImplementation((options: { where: { id: number } }) => {
@@ -119,9 +149,10 @@ describe('PTT Tomei (Integration)', () => {
         .get('/health')
         .expect(200)
         .expect((res) => {
-          expect(res.body.status).toBe('ok');
-          expect(res.body.database).toEqual({ status: 'ok' });
-          expect(res.body.timestamp).toBeDefined();
+          const body = res.body as HealthResponse;
+          expect(body.status).toBe('ok');
+          expect(body.database).toEqual({ status: 'ok' });
+          expect(body.timestamp).toBeDefined();
         });
     });
   });
@@ -133,43 +164,47 @@ describe('PTT Tomei (Integration)', () => {
         .send({ title: 'PTT Task', description: 'PTT Description' })
         .expect(201);
 
-      expect(createRes.body.success).toBe(true);
-      expect(createRes.body.data.title).toBe('PTT Task');
-      expect(createRes.body.data.status).toBe(TaskStatus.TODO);
-      const taskId = createRes.body.data.id as number;
+      expect((createRes.body as TaskResponse).success).toBe(true);
+      expect((createRes.body as TaskResponse).data.title).toBe('PTT Task');
+      expect((createRes.body as TaskResponse).data.status).toBe(
+        TaskStatus.TODO,
+      );
+      const taskId = (createRes.body as TaskResponse).data.id;
 
       const listRes = await request(app.getHttpServer())
         .get('/tasks')
         .expect(200);
 
-      expect(listRes.body.success).toBe(true);
-      expect(listRes.body.data).toHaveLength(1);
+      expect((listRes.body as TaskListResponse).success).toBe(true);
+      expect((listRes.body as TaskListResponse).data).toHaveLength(1);
 
       const getRes = await request(app.getHttpServer())
         .get(`/tasks/${taskId}`)
         .expect(200);
 
-      expect(getRes.body.success).toBe(true);
-      expect(getRes.body.data.id).toBe(taskId);
+      expect((getRes.body as TaskResponse).success).toBe(true);
+      expect((getRes.body as TaskResponse).data.id).toBe(taskId);
 
       const updateRes = await request(app.getHttpServer())
         .put(`/tasks/${taskId}`)
         .send({ status: TaskStatus.DONE })
         .expect(200);
 
-      expect(updateRes.body.success).toBe(true);
-      expect(updateRes.body.data.status).toBe(TaskStatus.DONE);
+      expect((updateRes.body as TaskResponse).success).toBe(true);
+      expect((updateRes.body as TaskResponse).data.status).toBe(
+        TaskStatus.DONE,
+      );
 
       const deleteRes = await request(app.getHttpServer())
         .delete(`/tasks/${taskId}`)
         .expect(200);
 
-      expect(deleteRes.body.success).toBe(true);
-      expect(deleteRes.body.message).toBe('Task deleted successfully');
+      expect((deleteRes.body as TaskResponse).success).toBe(true);
+      expect((deleteRes.body as TaskResponse).message).toBe(
+        'Task deleted successfully',
+      );
 
-      await request(app.getHttpServer())
-        .get(`/tasks/${taskId}`)
-        .expect(404);
+      await request(app.getHttpServer()).get(`/tasks/${taskId}`).expect(404);
     });
   });
 
@@ -180,8 +215,8 @@ describe('PTT Tomei (Integration)', () => {
         .send({ title: '' })
         .expect(400);
 
-      expect(res.body.success).toBe(false);
-      expect(res.body.errors).toBeDefined();
+      expect((res.body as ErrorResponse).success).toBe(false);
+      expect((res.body as ErrorResponse).errors).toBeDefined();
     });
 
     it('should return 400 when creating a task with extra fields', async () => {
@@ -190,7 +225,7 @@ describe('PTT Tomei (Integration)', () => {
         .send({ title: 'Valid', unknownField: 'not allowed' })
         .expect(400);
 
-      expect(res.body.success).toBe(false);
+      expect((res.body as ErrorResponse).success).toBe(false);
     });
 
     it('should return 400 when updating with invalid status', async () => {
@@ -203,14 +238,14 @@ describe('PTT Tomei (Integration)', () => {
         .get('/tasks')
         .expect(200);
 
-      const taskId = listRes.body.data[0].id as number;
+      const taskId = (listRes.body as TaskListResponse).data[0].id;
 
       const res = await request(app.getHttpServer())
         .put(`/tasks/${taskId}`)
         .send({ status: 'INVALID' })
         .expect(400);
 
-      expect(res.body.success).toBe(false);
+      expect((res.body as ErrorResponse).success).toBe(false);
     });
   });
 
@@ -220,8 +255,8 @@ describe('PTT Tomei (Integration)', () => {
         .get('/tasks/99999')
         .expect(404);
 
-      expect(res.body.success).toBe(false);
-      expect(res.body.errors).toBeDefined();
+      expect((res.body as ErrorResponse).success).toBe(false);
+      expect((res.body as ErrorResponse).errors).toBeDefined();
     });
 
     it('should return 404 when updating non-existent task', async () => {
@@ -232,9 +267,7 @@ describe('PTT Tomei (Integration)', () => {
     });
 
     it('should return 404 when deleting non-existent task', async () => {
-      await request(app.getHttpServer())
-        .delete('/tasks/99999')
-        .expect(404);
+      await request(app.getHttpServer()).delete('/tasks/99999').expect(404);
     });
   });
 
@@ -250,7 +283,7 @@ describe('PTT Tomei (Integration)', () => {
         .send({ title: 'Task 2' })
         .expect(201);
 
-      const task2Id = res2.body.data.id as number;
+      const task2Id = (res2.body as TaskResponse).data.id;
       await request(app.getHttpServer())
         .put(`/tasks/${task2Id}`)
         .send({ status: TaskStatus.DONE })
@@ -260,9 +293,11 @@ describe('PTT Tomei (Integration)', () => {
         .get('/tasks?status=TODO')
         .expect(200);
 
-      expect(todoRes.body.success).toBe(true);
-      expect(todoRes.body.data).toHaveLength(1);
-      expect(todoRes.body.data[0].status).toBe(TaskStatus.TODO);
+      expect((todoRes.body as TaskListResponse).success).toBe(true);
+      expect((todoRes.body as TaskListResponse).data).toHaveLength(1);
+      expect((todoRes.body as TaskListResponse).data[0].status).toBe(
+        TaskStatus.TODO,
+      );
     });
   });
 });
