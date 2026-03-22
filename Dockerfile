@@ -4,7 +4,9 @@ WORKDIR /app
 
 COPY personal-task-tracker-core ./personal-task-tracker-core
 COPY package*.json ./
-RUN npm install
+RUN npm install && \
+    rm -rf node_modules/personal-task-tracker-core && \
+    cp -r personal-task-tracker-core node_modules/personal-task-tracker-core
 
 COPY . .
 RUN npm run build
@@ -15,7 +17,9 @@ WORKDIR /app
 
 COPY personal-task-tracker-core ./personal-task-tracker-core
 COPY package*.json ./
-RUN npm install --omit=dev
+RUN npm install --omit=dev && \
+    rm -rf node_modules/personal-task-tracker-core && \
+    cp -r personal-task-tracker-core node_modules/personal-task-tracker-core
 
 COPY --from=builder /app/dist ./dist
 
