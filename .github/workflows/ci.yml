@@ -20,11 +20,24 @@ jobs:
       - name: Checkout API
         uses: actions/checkout@v4
 
+      - name: Checkout Core
+        uses: actions/checkout@v4
+        with:
+          repository: nurulizyansyaza/personal-task-tracker-core
+          token: ${{ secrets.DOCKER_REPO_PAT }}
+          path: ../personal-task-tracker-core
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: "npm"
+
+      - name: Build Core
+        run: |
+          cd ../personal-task-tracker-core
+          npm ci
+          npm run build
 
       - name: Install dependencies
         run: npm ci
