@@ -130,11 +130,11 @@ describe('PTT Tomei (Integration)', () => {
     it('should create, read, update, and delete a task', async () => {
       const createRes = await request(app.getHttpServer())
         .post('/tasks')
-        .send({ title: 'PTT-TOMEI Task', description: 'PTT-TOMEI Description' })
+        .send({ title: 'PTT Task', description: 'PTT Description' })
         .expect(201);
 
       expect(createRes.body.success).toBe(true);
-      expect(createRes.body.data.title).toBe('PTT-TOMEI Task');
+      expect(createRes.body.data.title).toBe('PTT Task');
       expect(createRes.body.data.status).toBe(TaskStatus.TODO);
       const taskId = createRes.body.data.id as number;
 
