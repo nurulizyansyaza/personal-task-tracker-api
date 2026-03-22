@@ -16,7 +16,7 @@ import {
 export class UpdateTaskDto {
   @ApiProperty({ example: 'Buy groceries', required: false })
   @IsOptional()
-  @ValidateIf((o) => o.title !== undefined)
+  @ValidateIf((o: UpdateTaskDto) => o.title !== undefined)
   @IsNotEmpty({ message: 'Title cannot be empty' })
   @IsString()
   @MaxLength(TASK_TITLE_MAX_LENGTH)
