@@ -299,7 +299,7 @@ flowchart TD
 
 ## Testing
 
-The project has **84 tests** across **13 test suites**.
+The project has **84 tests** across **17 test suites**.
 
 ### Unit Tests (12 suites, 74 tests)
 
@@ -309,9 +309,9 @@ Covers controllers, services, DTOs, filters, interceptors, configs, entities, an
 npm test
 ```
 
-### Integration Tests (1 suite, 10 tests)
+### Integration Tests (5 suites, 10 tests)
 
-End-to-end CRUD workflow including validation errors, 404 handling, and status filtering.
+Split by concern: health, CRUD workflow, validation errors, 404 handling, and status filtering.
 
 ```bash
 npm run test:ptt-tomei
