@@ -64,7 +64,7 @@ function createMockTaskRepository() {
   };
 }
 
-describe('App (e2e)', () => {
+describe('PTT Tomei (Integration)', () => {
   let app: INestApplication<App>;
   let mockRepo: ReturnType<typeof createMockTaskRepository>;
 
