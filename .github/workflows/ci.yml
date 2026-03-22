@@ -1,0 +1,66 @@
+# ============================================
+# CI: Build, Test & Sync to Docker Repo
+# ============================================
+# Triggers on push to main branch
+# Builds, tests, then pushes to docker repo staging + main branches
+
+name: CI - Build, Test & Sync
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout API
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Run tests
+        run: npm run test
+
+  sync-to-docker-repo:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Checkout Docker Repo
+        uses: actions/checkout@v4
+        with:
+          repository: nurulizyansyaza/personal-task-tracker
+          token: ${{ secrets.DOCKER_REPO_PAT }}
+          fetch-depth: 0
+
+      - name: Update staging branch
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git checkout staging || git checkout -b staging
+          git commit --allow-empty -m "chore: sync api update from ${{ github.sha }}"
+          git push origin staging
+
+      - name: Update main branch
+        run: |
+          git checkout main
+          git commit --allow-empty -m "chore: sync api update from ${{ github.sha }}"
+          git push origin main
