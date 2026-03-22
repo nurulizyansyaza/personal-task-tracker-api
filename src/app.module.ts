@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { TasksModule } from './tasks/tasks.module';
+import { HealthModule } from './health/health.module';
 import { TaskEntity } from './tasks/entities/task.entity';
 import databaseConfig from './config/database.config';
 import redisConfig from './config/redis.config';
@@ -47,6 +48,7 @@ import redisConfig from './config/redis.config';
       }),
     }),
     TasksModule,
+    HealthModule,
   ],
   providers: [
     {

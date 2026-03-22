@@ -11,21 +11,27 @@ import {
   TaskStatus,
   TASK_TITLE_MAX_LENGTH,
   TASK_DESCRIPTION_MAX_LENGTH,
+  getErrorMessage,
+  ErrorCode,
 } from 'personal-task-tracker-core';
 
 export class UpdateTaskDto {
   @ApiProperty({ example: 'Buy groceries', required: false })
   @IsOptional()
   @ValidateIf((o: UpdateTaskDto) => o.title !== undefined)
-  @IsNotEmpty({ message: 'Title cannot be empty' })
+  @IsNotEmpty({ message: getErrorMessage(ErrorCode.TITLE_REQUIRED) })
   @IsString()
-  @MaxLength(TASK_TITLE_MAX_LENGTH)
+  @MaxLength(TASK_TITLE_MAX_LENGTH, {
+    message: getErrorMessage(ErrorCode.TITLE_TOO_LONG),
+  })
   title?: string;
 
   @ApiProperty({ example: 'Milk, eggs, bread', required: false })
   @IsOptional()
   @IsString()
-  @MaxLength(TASK_DESCRIPTION_MAX_LENGTH)
+  @MaxLength(TASK_DESCRIPTION_MAX_LENGTH, {
+    message: getErrorMessage(ErrorCode.DESCRIPTION_TOO_LONG),
+  })
   description?: string | null;
 
   @ApiProperty({
@@ -35,7 +41,7 @@ export class UpdateTaskDto {
   })
   @IsOptional()
   @IsEnum(TaskStatus, {
-    message: `Status must be one of: ${Object.values(TaskStatus).join(', ')}`,
+    message: getErrorMessage(ErrorCode.INVALID_STATUS),
   })
   status?: TaskStatus;
 }
