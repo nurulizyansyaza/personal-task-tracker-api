@@ -83,7 +83,10 @@ describe('TasksService', () => {
     it('should create a task', async () => {
       repository.create.mockReturnValue(mockTask);
       repository.save.mockResolvedValue(mockTask);
-      const result = await service.create({ title: 'Test Task', description: 'Test description' });
+      const result = await service.create({
+        title: 'Test Task',
+        description: 'Test description',
+      });
       expect(result).toEqual(mockTask);
       expect(repository.create).toHaveBeenCalledWith({
         title: 'Test Task',
@@ -103,16 +106,25 @@ describe('TasksService', () => {
 
   describe('update', () => {
     it('should update a task', async () => {
-      const updatedTask = { ...mockTask, title: 'Updated', status: TaskStatus.DONE };
+      const updatedTask = {
+        ...mockTask,
+        title: 'Updated',
+        status: TaskStatus.DONE,
+      };
       repository.findOne.mockResolvedValue({ ...mockTask });
       repository.save.mockResolvedValue(updatedTask);
-      const result = await service.update(1, { title: 'Updated', status: TaskStatus.DONE });
+      const result = await service.update(1, {
+        title: 'Updated',
+        status: TaskStatus.DONE,
+      });
       expect(result.title).toBe('Updated');
     });
 
     it('should throw NotFoundException for invalid id', async () => {
       repository.findOne.mockResolvedValue(null);
-      await expect(service.update(999, { title: 'Test' })).rejects.toThrow(NotFoundException);
+      await expect(service.update(999, { title: 'Test' })).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 

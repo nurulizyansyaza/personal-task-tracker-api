@@ -28,7 +28,11 @@ export class UpdateTaskDto {
   @MaxLength(TASK_DESCRIPTION_MAX_LENGTH)
   description?: string | null;
 
-  @ApiProperty({ enum: TaskStatus, example: TaskStatus.IN_PROGRESS, required: false })
+  @ApiProperty({
+    enum: TaskStatus,
+    example: TaskStatus.IN_PROGRESS,
+    required: false,
+  })
   @IsOptional()
   @IsEnum(TaskStatus, {
     message: `Status must be one of: ${Object.values(TaskStatus).join(', ')}`,
