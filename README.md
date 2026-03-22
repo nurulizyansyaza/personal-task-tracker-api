@@ -12,11 +12,12 @@ A REST API for managing personal tasks, built with **NestJS 11**. It stores task
 4. [Error Handling](#error-handling)
 5. [Middleware Stack](#middleware-stack)
 6. [Testing](#testing)
-7. [Bruno Collection](#bruno-collection)
-8. [Project Structure](#project-structure)
-9. [Environment Variables](#environment-variables)
-10. [Deployment](#deployment)
-11. [Architecture](#architecture)
+7. [Swagger API Docs](#swagger-api-docs)
+8. [Bruno Collection](#bruno-collection)
+9. [Project Structure](#project-structure)
+10. [Environment Variables](#environment-variables)
+11. [Deployment](#deployment)
+12. [Architecture](#architecture)
 
 ---
 
@@ -339,6 +340,41 @@ npm run test:cov
 
 ---
 
+## Swagger API Docs
+
+The API ships with interactive documentation powered by [Swagger / OpenAPI](https://swagger.io/). Every endpoint, request body, query parameter, and response schema is documented — you can test requests directly from the browser.
+
+### Accessing Swagger UI
+
+| Environment | URL |
+|-------------|-----|
+| **Local** | [http://localhost:3000/api/docs](http://localhost:3000/api/docs) |
+| **Staging** | [https://diofa9vowlzj6.cloudfront.net/api/docs](https://diofa9vowlzj6.cloudfront.net/api/docs) |
+| **Production** | [https://d270j9db8ffegc.cloudfront.net/api/docs](https://d270j9db8ffegc.cloudfront.net/api/docs) |
+
+### How to Use
+
+1. Start the API server locally (`npm run start:dev`) or use a deployed URL above.
+2. Open the Swagger URL in your browser.
+3. You will see all endpoints grouped under **Tasks** and **Health** tags.
+4. Click any endpoint to expand it — you will see:
+   - **Parameters** — path params (`:id`), query params (`?status=`)
+   - **Request body** — required and optional fields with examples
+   - **Responses** — success and error schemas with status codes
+5. Click **"Try it out"** on any endpoint, fill in the fields, and click **"Execute"** to send a real request.
+6. The response body, status code, and headers appear below.
+
+### What's Documented
+
+- All CRUD endpoints with typed request/response schemas
+- Success response wrapper: `{ success: boolean, data: T, message?: string }`
+- Error response structure: `{ success: false, statusCode, error, message, errors[], timestamp, path }`
+- Enum values for `TaskStatus` (TODO, IN_PROGRESS, DONE)
+- Validation constraints (title max length, description max length)
+- 400, 404, and 500 error responses on every endpoint
+
+---
+
 ## Bruno Collection
 
 The `bruno/` directory contains **23 pre-built API requests** you can use to explore the API interactively with [Bruno](https://www.usebruno.com/) (a free, open-source API client).
@@ -483,6 +519,6 @@ flowchart TD
 | Repo | Description | Tests |
 |------|-------------|-------|
 | [personal-task-tracker](https://github.com/nurulizyansyaza/personal-task-tracker) | Orchestration — CI/CD, Docker, AWS infra | — |
-| [personal-task-tracker-core](https://github.com/nurulizyansyaza/personal-task-tracker-core) | Shared TypeScript library — types, validation, errors | 42 |
-| [personal-task-tracker-api](https://github.com/nurulizyansyaza/personal-task-tracker-api) | NestJS REST API with security middleware | 84 |
-| [personal-task-tracker-frontend](https://github.com/nurulizyansyaza/personal-task-tracker-frontend) | Next.js Kanban dashboard | 52 |
+| [personal-task-tracker-core](https://github.com/nurulizyansyaza/personal-task-tracker-core) | Shared TypeScript library — types, validation, errors | 41 |
+| [personal-task-tracker-api](https://github.com/nurulizyansyaza/personal-task-tracker-api) | NestJS REST API with security middleware | 74 |
+| [personal-task-tracker-frontend](https://github.com/nurulizyansyaza/personal-task-tracker-frontend) | Next.js Kanban dashboard | 94 |
