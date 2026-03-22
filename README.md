@@ -22,17 +22,17 @@ A REST API for managing personal tasks, built with **NestJS 11**. It stores task
 
 ## Tech Stack
 
-| Category | Technology | Version |
-|----------|-----------|---------|
-| Runtime | Node.js | 20 |
-| Language | TypeScript | 5 |
-| Framework | NestJS | 11 |
-| ORM | TypeORM | — |
-| Database | MariaDB | 10.11 |
-| Cache | Redis (cache-manager) | — |
-| Validation | class-validator + class-transformer | — |
-| Docs | Swagger / OpenAPI | — |
-| Shared Logic | personal-task-tracker-core | — |
+| Technology | Version | Purpose |
+|-----------|---------|---------|
+| Node.js | 20 | Runtime |
+| TypeScript | 5 | Language |
+| NestJS | 11 | REST API framework |
+| TypeORM | — | Database ORM for MariaDB |
+| MariaDB | 10.11 | Relational database (via AWS RDS) |
+| Redis (cache-manager) | — | Caching layer |
+| class-validator + class-transformer | — | Request body validation |
+| Swagger / OpenAPI | — | Interactive API documentation |
+| personal-task-tracker-core | — | Shared types, validation, errors |
 
 ---
 
@@ -40,27 +40,27 @@ A REST API for managing personal tasks, built with **NestJS 11**. It stores task
 
 ### Prerequisites
 
-Make sure the following are installed on your machine:
+| Tool | Version | How to check | How to install |
+|------|---------|-------------|----------------|
+| Node.js | 20 | `node -v` | [nodejs.org](https://nodejs.org/) |
+| npm | >= 9 | `npm -v` | Included with Node.js |
+| MariaDB | 10.11 | `mariadb --version` | [mariadb.org](https://mariadb.org/download/) |
+| Redis | >= 7 | `redis-server --version` | [redis.io](https://redis.io/download) |
 
-- **Node.js 20** — [download](https://nodejs.org/)
-- **npm** (comes with Node.js)
-- **MariaDB 10.11** — [download](https://mariadb.org/download/)
-- **Redis** — [download](https://redis.io/download)
-
-### 1. Clone the repository
+### Step 1 — Clone the repository
 
 ```bash
 git clone https://github.com/nurulizyansyaza/personal-task-tracker.git
 cd personal-task-tracker/personal-task-tracker-api
 ```
 
-### 2. Install dependencies
+### Step 2 — Install dependencies
 
 ```bash
 npm install
 ```
 
-### 3. Configure environment variables
+### Step 3 — Configure environment variables
 
 ```bash
 cp .env.example .env
@@ -68,7 +68,7 @@ cp .env.example .env
 
 Open `.env` and fill in your database and Redis credentials (see [Environment Variables](#environment-variables) below).
 
-### 4. Start the development server
+### Step 4 — Start the development server
 
 ```bash
 npm run start:dev
@@ -76,7 +76,7 @@ npm run start:dev
 
 The API will be available at **http://localhost:3000**. Swagger docs are at **http://localhost:3000/api/docs**.
 
-### 5. Verify it works
+### Step 5 — Verify it works
 
 ```bash
 curl http://localhost:3000/health
@@ -275,15 +275,15 @@ Every request passes through these layers **in order** before reaching your rout
 
 ```mermaid
 flowchart TD
- REQ[" Incoming Request"]
- REQ --> HELMET["1⃣ Helmet\n(Security Headers)"]
- HELMET --> CORS["2⃣ CORS\n(Origin Validation)"]
- CORS --> THROTTLE["3⃣ Rate Limiter\n(ThrottlerGuard)"]
- THROTTLE --> PIPE["4⃣ ValidationPipe\n(Body Validation)"]
- PIPE --> FILTER["5⃣ AllExceptionsFilter\n(Error Mapping)"]
- FILTER --> LOG["6⃣ LoggingInterceptor\n(Request Logging)"]
- LOG --> HANDLER[" Route Handler"]
- HANDLER --> RES[" Response"]
+ REQ["Incoming Request"]
+ REQ --> HELMET["1. Helmet\n(Security Headers)"]
+ HELMET --> CORS["2. CORS\n(Origin Validation)"]
+ CORS --> THROTTLE["3. Rate Limiter\n(ThrottlerGuard)"]
+ THROTTLE --> PIPE["4. ValidationPipe\n(Body Validation)"]
+ PIPE --> FILTER["5. AllExceptionsFilter\n(Error Mapping)"]
+ FILTER --> LOG["6. LoggingInterceptor\n(Request Logging)"]
+ LOG --> HANDLER["Route Handler"]
+ HANDLER --> RES["Response"]
 ```
 
 | # | Layer | Package | What It Does |
@@ -452,8 +452,8 @@ This diagram shows the full lifecycle of a request through the application:
 
 ```mermaid
 flowchart TD
- CLIENT[" Client"] -->|HTTP Request| CF[" CloudFront"]
- CF -->|Forward| EC2[" EC2"]
+ CLIENT["Client"] -->|HTTP Request| CF["CloudFront"]
+ CF -->|Forward| EC2["EC2"]
  EC2 -->|Port 3000| NEST["NestJS Application"]
 
  subgraph NEST["NestJS Application"]
@@ -470,7 +470,18 @@ flowchart TD
  HELMET --> CORS --> THROTTLE --> VPIPE --> FILTER --> LOGGER --> CONTROLLER --> SERVICE
  end
 
- SERVICE -->|Query / Insert| DB[" MariaDB"]
- SERVICE -->|Get / Set| CACHE[" Redis Cache"]
+ SERVICE -->|Query / Insert| DB["MariaDB"]
+ SERVICE -->|Get / Set| CACHE["Redis Cache"]
  NEST -->|JSON Response| CLIENT
 ```
+
+---
+
+## Related Repositories
+
+| Repo | Description | Tests |
+|------|-------------|-------|
+| [personal-task-tracker](https://github.com/nurulizyansyaza/personal-task-tracker) | Orchestration — CI/CD, Docker, AWS infra | — |
+| [personal-task-tracker-core](https://github.com/nurulizyansyaza/personal-task-tracker-core) | Shared TypeScript library — types, validation, errors | 42 |
+| [personal-task-tracker-api](https://github.com/nurulizyansyaza/personal-task-tracker-api) | NestJS REST API with security middleware | 84 |
+| [personal-task-tracker-frontend](https://github.com/nurulizyansyaza/personal-task-tracker-frontend) | Next.js Kanban dashboard | 52 |
