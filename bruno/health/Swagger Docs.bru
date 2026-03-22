@@ -1,0 +1,46 @@
+meta {
+  name: Swagger Docs
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/docs
+  body: none
+  auth: none
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("should return 200 OK", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("should return HTML page", function() {
+    const contentType = res.getHeader("content-type");
+    expect(contentType).to.include("text/html");
+  });
+
+  test("should contain Swagger UI", function() {
+    const body = res.getBody();
+    expect(body).to.include("swagger");
+  });
+}
+
+docs {
+  ## GET /api/docs
+
+  Swagger UI endpoint serving the interactive OpenAPI documentation.
+
+  ### Response (200 OK)
+  Returns an HTML page rendering the Swagger UI with all available
+  API endpoints, request/response schemas, and a "Try it out" feature.
+
+  ### What to verify
+  - Page loads without errors
+  - All endpoints listed under the Tasks and Health tags
+  - Request and response schemas are visible
+}

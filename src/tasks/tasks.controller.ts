@@ -17,6 +17,12 @@ import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { TaskEntity } from './entities/task.entity';
+import {
+  TaskListSuccessDto,
+  TaskSuccessDto,
+  DeleteSuccessDto,
+  ErrorResponseDto,
+} from '../common/dto/response.dto';
 
 @ApiTags('Tasks')
 @Controller('tasks')
@@ -31,7 +37,16 @@ export class TasksController {
     required: false,
     description: 'Filter tasks by status',
   })
-  @ApiResponse({ status: 200, description: 'List of tasks' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of tasks',
+    type: TaskListSuccessDto,
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error',
+    type: ErrorResponseDto,
+  })
   async findAll(
     @Query('status') status?: TaskStatus,
   ): Promise<{ success: boolean; data: TaskEntity[] }> {
@@ -41,8 +56,17 @@ export class TasksController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get a task by ID' })
-  @ApiResponse({ status: 200, description: 'Task found' })
-  @ApiResponse({ status: 404, description: 'Task not found' })
+  @ApiResponse({ status: 200, description: 'Task found', type: TaskSuccessDto })
+  @ApiResponse({
+    status: 404,
+    description: 'Task not found',
+    type: ErrorResponseDto,
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error',
+    type: ErrorResponseDto,
+  })
   async findOne(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<{ success: boolean; data: TaskEntity }> {
@@ -52,8 +76,21 @@ export class TasksController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new task' })
-  @ApiResponse({ status: 201, description: 'Task created' })
-  @ApiResponse({ status: 400, description: 'Validation error' })
+  @ApiResponse({
+    status: 201,
+    description: 'Task created',
+    type: TaskSuccessDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Validation error',
+    type: ErrorResponseDto,
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error',
+    type: ErrorResponseDto,
+  })
   async create(
     @Body() createTaskDto: CreateTaskDto,
   ): Promise<{ success: boolean; data: TaskEntity; message: string }> {
@@ -63,9 +100,26 @@ export class TasksController {
 
   @Put(':id')
   @ApiOperation({ summary: 'Update a task' })
-  @ApiResponse({ status: 200, description: 'Task updated' })
-  @ApiResponse({ status: 400, description: 'Validation error' })
-  @ApiResponse({ status: 404, description: 'Task not found' })
+  @ApiResponse({
+    status: 200,
+    description: 'Task updated',
+    type: TaskSuccessDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Validation error',
+    type: ErrorResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Task not found',
+    type: ErrorResponseDto,
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error',
+    type: ErrorResponseDto,
+  })
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateTaskDto: UpdateTaskDto,
@@ -77,8 +131,21 @@ export class TasksController {
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete a task' })
-  @ApiResponse({ status: 200, description: 'Task deleted' })
-  @ApiResponse({ status: 404, description: 'Task not found' })
+  @ApiResponse({
+    status: 200,
+    description: 'Task deleted',
+    type: DeleteSuccessDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Task not found',
+    type: ErrorResponseDto,
+  })
+  @ApiResponse({
+    status: 500,
+    description: 'Internal server error',
+    type: ErrorResponseDto,
+  })
   async remove(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<{ success: boolean; message: string }> {

@@ -341,7 +341,7 @@ npm run test:cov
 
 ## Bruno Collection
 
-The `bruno/` directory contains **22 pre-built API requests** you can use to explore the API interactively with [Bruno](https://www.usebruno.com/) (a free, open-source API client).
+The `bruno/` directory contains **23 pre-built API requests** you can use to explore the API interactively with [Bruno](https://www.usebruno.com/) (a free, open-source API client).
 
 ### Setup
 
@@ -353,7 +353,7 @@ The `bruno/` directory contains **22 pre-built API requests** you can use to exp
 
 | Folder | Requests | Purpose |
 |--------|----------|---------|
-| `health` | 1 | Health check |
+| `health` | 2 | Health check, Swagger docs |
 | `tasks` | 8 | Core CRUD operations |
 | `tasks-validation` | 7 | Validation edge cases (missing title, invalid status, etc.) |
 | `tasks-errors` | 6 | Error scenarios (not found, bad ID, etc.) |
@@ -377,6 +377,7 @@ src/
 ├── app.service.ts # Root service
 ├── main.ts # Bootstrap — applies middleware, starts server
 ├── common/
+│ ├── dto/response.dto.ts # Swagger response schemas (success + error wrappers)
 │ ├── filters/all-exceptions.filter.ts # Global exception filter (ApiErrorResponse)
 │ └── interceptors/logging.interceptor.ts # Logs method, url, status, duration
 ├── config/
