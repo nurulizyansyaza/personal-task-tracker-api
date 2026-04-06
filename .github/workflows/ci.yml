@@ -66,11 +66,13 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git checkout staging || git checkout -b staging
+          git pull --rebase origin staging || true
           git commit --allow-empty -m "chore: sync api update from ${{ github.sha }}"
           git push origin staging
 
       - name: Update main branch
         run: |
           git checkout main
+          git pull --rebase origin main
           git commit --allow-empty -m "chore: sync api update from ${{ github.sha }}"
           git push origin main
