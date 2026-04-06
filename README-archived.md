@@ -29,7 +29,7 @@ A REST API for managing personal tasks, built with **NestJS 11**. It stores task
 | TypeScript | 5 | Language |
 | NestJS | 11 | REST API framework |
 | TypeORM | — | Database ORM for MariaDB |
-| MariaDB | 10.11 | Relational database (via Docker container) |
+| MariaDB | 10.11 | Relational database (via AWS RDS) |
 | Redis (cache-manager) | — | Caching layer |
 | class-validator + class-transformer | — | Request body validation |
 | Swagger / OpenAPI | — | Interactive API documentation |
@@ -349,8 +349,8 @@ The API ships with interactive documentation powered by [Swagger / OpenAPI](http
 | Environment | URL |
 |-------------|-----|
 | **Local** | [http://localhost:3000/api/docs](http://localhost:3000/api/docs) |
-| **Staging** | `https://nurulizyansyaza.com/staging/personal-task-tracker/api/docs` |
-| **Production** | `https://nurulizyansyaza.com/personal-task-tracker/api/docs` |
+| **Staging** | [https://diofa9vowlzj6.cloudfront.net/api/docs](https://diofa9vowlzj6.cloudfront.net/api/docs) |
+| **Production** | [https://d270j9db8ffegc.cloudfront.net/api/docs](https://d270j9db8ffegc.cloudfront.net/api/docs) |
 
 ### How to Use
 
@@ -399,8 +399,8 @@ The `bruno/` directory contains **23 pre-built API requests** you can use to exp
 | Environment | Base URL |
 |-------------|----------|
 | **Local** | `http://localhost:3000` |
-| **Staging** | `https://nurulizyansyaza.com/staging/personal-task-tracker/api` |
-| **Production** | `https://nurulizyansyaza.com/personal-task-tracker/api` |
+| **Staging** | `https://diofa9vowlzj6.cloudfront.net` |
+| **Production** | `https://d270j9db8ffegc.cloudfront.net` |
 
 ---
 
@@ -460,23 +460,23 @@ cp .env.example .env
 
 The API is deployed via the [orchestration repo](https://github.com/nurulizyansyaza/personal-task-tracker) CI/CD pipeline.
 
-| Environment | URL | Swagger Docs |
+| Environment | CloudFront URL | Swagger Docs |
 |-------------|---------------|-------------|
-| **Staging** | `https://nurulizyansyaza.com/staging/personal-task-tracker/api` | [/api/docs](https://nurulizyansyaza.com/staging/personal-task-tracker/api/docs) |
-| **Production** | `https://nurulizyansyaza.com/personal-task-tracker/api` | [/api/docs](https://nurulizyansyaza.com/personal-task-tracker/api/docs) |
+| **Staging** | `https://diofa9vowlzj6.cloudfront.net` | [/api/docs](https://diofa9vowlzj6.cloudfront.net/api/docs) |
+| **Production** | `https://d270j9db8ffegc.cloudfront.net` | [/api/docs](https://d270j9db8ffegc.cloudfront.net/api/docs) |
 
 ### Infrastructure
 
 ```mermaid
 flowchart LR
  CLIENT["Client\n(Browser / Mobile)"]
- NGX["Nginx Reverse Proxy\n(HTTPS Termination)"]
- HL["Homelab Server\n(Docker)"]
+ CF["CloudFront CDN\n(HTTPS Termination)"]
+ EC2["EC2 (t3.micro)\nap-southeast-1"]
  API["NestJS :3000"]
  REDIS["Redis :6379"]
  DB["MariaDB 10.11"]
 
- CLIENT --> NGX --> HL --> API
+ CLIENT --> CF --> EC2 --> API
  API --> REDIS
  API --> DB
 ```
@@ -489,9 +489,9 @@ This diagram shows the full lifecycle of a request through the application:
 
 ```mermaid
 flowchart TD
- CLIENT["Client"] -->|HTTP Request| NGX["Nginx"]
- NGX -->|Forward| HL["Homelab"]
- HL -->|Port 3000| NEST["NestJS Application"]
+ CLIENT["Client"] -->|HTTP Request| CF["CloudFront"]
+ CF -->|Forward| EC2["EC2"]
+ EC2 -->|Port 3000| NEST["NestJS Application"]
 
  subgraph NEST["NestJS Application"]
  direction TB
@@ -518,7 +518,7 @@ flowchart TD
 
 | Repo | Description | Tests |
 |------|-------------|-------|
-| [personal-task-tracker](https://github.com/nurulizyansyaza/personal-task-tracker) | Orchestration — CI/CD, Docker, homelab infra | — |
+| [personal-task-tracker](https://github.com/nurulizyansyaza/personal-task-tracker) | Orchestration — CI/CD, Docker, AWS infra | — |
 | [personal-task-tracker-core](https://github.com/nurulizyansyaza/personal-task-tracker-core) | Shared TypeScript library — types, validation, errors | 41 |
 | [personal-task-tracker-api](https://github.com/nurulizyansyaza/personal-task-tracker-api) | NestJS REST API with security middleware | 74 |
 | [personal-task-tracker-frontend](https://github.com/nurulizyansyaza/personal-task-tracker-frontend) | Next.js Kanban dashboard | 96 |
