@@ -349,8 +349,8 @@ The API ships with interactive documentation powered by [Swagger / OpenAPI](http
 | Environment | URL |
 |-------------|-----|
 | **Local** | [http://localhost:3000/api/docs](http://localhost:3000/api/docs) |
-| **Staging** | `https://nurulizyansyaza.com/staging/personal-task-tracker/api/docs` |
-| **Production** | `https://nurulizyansyaza.com/personal-task-tracker/api/docs` |
+| **Staging** | `https://staging-ptt.nurulizyansyaza.com/api/docs` |
+| **Production** | `https://ptt.nurulizyansyaza.com/api/docs` |
 
 ### How to Use
 
@@ -399,8 +399,8 @@ The `bruno/` directory contains **23 pre-built API requests** you can use to exp
 | Environment | Base URL |
 |-------------|----------|
 | **Local** | `http://localhost:3000` |
-| **Staging** | `https://nurulizyansyaza.com/staging/personal-task-tracker/api` |
-| **Production** | `https://nurulizyansyaza.com/personal-task-tracker/api` |
+| **Staging** | `https://staging-ptt.nurulizyansyaza.com/api` |
+| **Production** | `https://ptt.nurulizyansyaza.com/api` |
 
 ---
 
@@ -462,8 +462,8 @@ The API is deployed via the [orchestration repo](https://github.com/nurulizyansy
 
 | Environment | URL | Swagger Docs |
 |-------------|---------------|-------------|
-| **Staging** | `https://nurulizyansyaza.com/staging/personal-task-tracker/api` | [/api/docs](https://nurulizyansyaza.com/staging/personal-task-tracker/api/docs) |
-| **Production** | `https://nurulizyansyaza.com/personal-task-tracker/api` | [/api/docs](https://nurulizyansyaza.com/personal-task-tracker/api/docs) |
+| **Staging** | `https://staging-ptt.nurulizyansyaza.com/api` | [/api/docs](https://staging-ptt.nurulizyansyaza.com/api/docs) |
+| **Production** | `https://ptt.nurulizyansyaza.com/api` | [/api/docs](https://ptt.nurulizyansyaza.com/api/docs) |
 
 ### Infrastructure
 
